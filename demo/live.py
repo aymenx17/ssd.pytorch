@@ -6,8 +6,9 @@ import time
 from imutils.video import FPS, WebcamVideoStream
 import argparse
 
+# ssd_300_VOC0712.pth
 parser = argparse.ArgumentParser(description='Single Shot MultiBox Detection')
-parser.add_argument('--weights', default='weights/ssd_300_VOC0712.pth',
+parser.add_argument('--weights', default='/home/cf/work/pytorch/ssd.pytorch/weights/ssd300_mAP_77.43_v2.pth',
                     type=str, help='Trained state_dict file path')
 parser.add_argument('--cuda', default=False, type=bool,
                     help='Use cuda to train model')
@@ -39,13 +40,20 @@ def cv2_demo(net, transform):
 
     # start video stream thread, allow buffer to fill
     print("[INFO] starting threaded video stream...")
-    stream = WebcamVideoStream(src=0).start()  # default camera
+    #stream = WebcamVideoStream(src=0).start()  # default camera
+    stream = cv2.VideoCapture(0)
+    stream.set(cv2.CAP_PROP_FPS, 6);
+    stream.set(3,1920)
+    stream.set(4,1080)
+
     time.sleep(1.0)
     # start fps timer
     # loop over frames from the video file stream
     while True:
         # grab next frame
-        frame = stream.read()
+        _ , frame = stream.read()
+        frame = cv2.resize(frame, (1280, 720))
+
         key = cv2.waitKey(1) & 0xFF
 
         # update FPS counter
@@ -67,14 +75,15 @@ def cv2_demo(net, transform):
 if __name__ == '__main__':
     import sys
     from os import path
+
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
     from data import BaseTransform, VOC_CLASSES as labelmap
     from ssd import build_ssd
 
-    net = build_ssd('test', 300, 21)    # initialize SSD
+    net = build_ssd('test', 300, 21)  # initialize SSD
     net.load_state_dict(torch.load(args.weights))
-    transform = BaseTransform(net.size, (104/256.0, 117/256.0, 123/256.0))
+    transform = BaseTransform(net.size, (104 / 256.0, 117 / 256.0, 123 / 256.0))
 
     fps = FPS().start()
     # stop the timer and display FPS information
@@ -86,4 +95,4 @@ if __name__ == '__main__':
 
     # cleanup
     cv2.destroyAllWindows()
-    stream.stop()
+    stream.release()

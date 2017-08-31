@@ -5,6 +5,7 @@ from torch.autograd import Variable
 from layers import *
 from data import v2
 import os
+import cv2
 
 
 class SSD(nn.Module):
@@ -122,14 +123,14 @@ class SSD(nn.Module):
 # https://github.com/pytorch/vision/blob/master/torchvision/models/vgg.py
 def vgg(cfg, i, batch_norm=False):
     layers = []
-    in_channels = i
+    in_channels = i  #3
     for v in cfg:
         if v == 'M':
             layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
         elif v == 'C':
             layers += [nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=True)]
         else:
-            conv2d = nn.Conv2d(in_channels, v, kernel_size=3, padding=1)
+            conv2d = nn.Conv2d(in_channels, v, kernel_size=3, padding=1)   #padding sul convolution vs maxpooling
             if batch_norm:
                 layers += [conv2d, nn.BatchNorm2d(v), nn.ReLU(inplace=True)]
             else:
