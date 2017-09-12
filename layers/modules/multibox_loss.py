@@ -77,7 +77,7 @@ class MultiBoxLoss(nn.Module):
         loc_t = Variable(loc_t, requires_grad=False)
         conf_t = Variable(conf_t, requires_grad=False)
 
-        pos = conf_t > 0
+        pos = conf_t > 0     #sono le top class labels for each priorbox 
         num_pos = pos.sum(keepdim=True)
 
         # Localization Loss (Smooth L1)

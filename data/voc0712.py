@@ -20,12 +20,14 @@ if sys.version_info[0] == 2:
 else:
     import xml.etree.ElementTree as ET
 
-VOC_CLASSES = (  # always index 0
-    'aeroplane', 'bicycle', 'bird', 'boat',
-    'bottle', 'bus', 'car', 'cat', 'chair',
-    'cow', 'diningtable', 'dog', 'horse',
-    'motorbike', 'person', 'pottedplant',
-    'sheep', 'sofa', 'train', 'tvmonitor')
+# VOC_CLASSES = (  # always index 0
+#     'aeroplane', 'bicycle', 'bird', 'boat',
+#     'bottle', 'bus', 'car', 'cat', 'chair',
+#     'cow', 'diningtable', 'dog', 'horse',
+#     'motorbike', 'person', 'pottedplant',
+#     'sheep', 'sofa', 'train', 'tvmonitor')
+VOC_CLASSES = ( 'skipper', 'scotti','sale','granrisparmio','tonnorio','colgate','kellogs', 'valfrutta', 'barilla', 'mano')
+
 
 # for making bounding boxes pretty
 COLORS = ((255, 0, 0, 128), (0, 255, 0, 128), (0, 0, 255, 128),

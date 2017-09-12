@@ -5,10 +5,11 @@ import cv2
 import time
 from imutils.video import FPS, WebcamVideoStream
 import argparse
+from videocapture import VideoStream
 
 # ssd_300_VOC0712.pth
 parser = argparse.ArgumentParser(description='Single Shot MultiBox Detection')
-parser.add_argument('--weights', default='/home/cf/work/pytorch/ssd.pytorch/weights/ssd300_mAP_77.43_v2.pth',
+parser.add_argument('--weights', default='/home/cf/work/pytorch/ssd.pytorch/weights/v2.pth',
                     type=str, help='Trained state_dict file path')
 parser.add_argument('--cuda', default=False, type=bool,
                     help='Use cuda to train model')
@@ -40,35 +41,25 @@ def cv2_demo(net, transform):
 
     # start video stream thread, allow buffer to fill
     print("[INFO] starting threaded video stream...")
-    #stream = WebcamVideoStream(src=0).start()  # default camera
-    stream = cv2.VideoCapture(0)
-    stream.set(cv2.CAP_PROP_FPS, 6);
-    stream.set(3,1920)
-    stream.set(4,1080)
 
-    time.sleep(1.0)
+
+
+
+
+
     # start fps timer
     # loop over frames from the video file stream
     while True:
-        # grab next frame
-        _ , frame = stream.read()
-        frame = cv2.resize(frame, (1280, 720))
-
-        key = cv2.waitKey(1) & 0xFF
+        st = time.time()
+        frame = cap.read()
 
         # update FPS counter
-        fps.update()
-        frame = predict(frame)
-
-        # keybindings for display
-        if key == ord('p'):  # pause
-            while True:
-                key2 = cv2.waitKey(1) or 0xff
-                cv2.imshow('frame', frame)
-                if key2 == ord('p'):  # resume
-                    break
-        cv2.imshow('frame', frame)
-        if key == 27:  # exit
+        #fps.update()
+        time.sleep(0.01)
+        #frame = predict(frame)
+        cv2.imshow('video',frame)
+        print ('diff %f' % (time.time() - st))
+        if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
 
@@ -81,18 +72,20 @@ if __name__ == '__main__':
     from data import BaseTransform, VOC_CLASSES as labelmap
     from ssd import build_ssd
 
-    net = build_ssd('test', 300, 21)  # initialize SSD
-    net.load_state_dict(torch.load(args.weights))
+    net = build_ssd('test', 300, 11)  # initialize SSD
+    #net.load_state_dict(torch.load(args.weights))
+    net.load_weights(args.weights)
     transform = BaseTransform(net.size, (104 / 256.0, 117 / 256.0, 123 / 256.0))
 
-    fps = FPS().start()
+    #fps = FPS().start()
     # stop the timer and display FPS information
-    cv2_demo(net.eval(), transform)
-    fps.stop()
+    cap = VideoStream(0)
+    cap.start()
 
-    print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-    print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+    cv2_demo(net.eval(), transform)
+    #fps.stop()
+
 
     # cleanup
+    cap.stop()
     cv2.destroyAllWindows()
-    stream.release()
